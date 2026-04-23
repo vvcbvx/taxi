@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تاكسي فوري - لوحة تحكم المسؤول</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        /* شاشة تسجيل الدخول */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 30px;
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            animation: fadeInUp 0.6s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header i {
+            font-size: 60px;
+            color: #667eea;
+        }
+
+        .login-header h1 {
+            font-size: 28px;
+            color: #333;
+            margin-top: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-size: 16px;
+            font-family: 'Cairo', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .login-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .login-btn:hover {
+            transform: scale(1.02);
+        }
+
+        /* المحتوى الرئيسي */
+        .dashboard {
+            display: none;
+            padding: 20px;
+        }
+
+        .navbar {
+            background: white;
+            border-radius: 20px;
+            padding: 15px 25px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .navbar h2 {
+            color: #667eea;
+        }
+
+        .navbar .admin-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        /* بطاقات الإحصائيات */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-icon i {
+            font-size: 30px;
+            color: white;
+        }
+
+        .stat-info h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .stat-info .value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* التبويبات */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        /* الجداول */
+        .table-container {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: right;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin: 0 5px;
+            font-size: 18px;
+        }
+
+        .approve-btn { color: #28a745; }
+        .reject-btn { color: #dc3545; }
+        .delete-btn { color: #ffc107; }
+
+        /* نموذج إضافة سائق */
+        .add-driver-form {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            display: none;
+        }
+
+        .add-driver-form h3 {
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .form-grid input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .show-form-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <!-- شاشة تسجيل الدخول -->
+    <div id="loginContainer" class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <i class="fas fa-taxi"></i>
+                <h1>تاكسي فوري</h1>
+                <p>لوحة تحكم المسؤول</p>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="adminEmail" placeholder="admin@taxiapp.com" required>
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="adminPassword" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="login-btn">دخول</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- لوحة التحكم -->
+    <div id="dashboard" class="dashboard">
+        <div class="navbar">
+            <h2><i class="fas fa-taxi"></i> تاكسي فوري - لوحة التحكم</h2>
+            <div class="admin-info">
+                <span id="adminName">مرحباً مدير النظام</span>
+                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> خروج</button>
+            </div>
+        </div>
+
+        <!-- بطاقات الإحصائيات -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-users"></i></div>
+                <div class="stat-info">
+                    <h3>إجمالي المستخدمين</h3>
+                    <div class="value" id="totalUsers">0</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-car"></i></div>
+                <div class="stat-info">
+                    <h3>إجمالي السائقين</h3>
+                    <div class="value" id="totalDrivers">0</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                <div class="stat-info">
+                    <h3>بإنتظار الموافقة</h3>
+                    <div class="value" id="pendingDrivers">0</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-info">
+                    <h3>سائقين نشطين</h3>
+                    <div class="value" id="activeDrivers">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- أزرار الإضافة -->
+        <button class="show-form-btn" onclick="toggleAddDriverForm()">
+            <i class="fas fa-plus"></i> إضافة سائق جديد
+        </button>
+
+        <!-- نموذج إضافة سائق -->
+        <div id="addDriverForm" class="add-driver-form">
+            <h3><i class="fas fa-user-plus"></i> إضافة سائق جديد</h3>
+            <form id="addDriverFormElement">
+                <div class="form-grid">
+                    <input type="text" id="driverName" placeholder="الاسم الكامل" required>
+                    <input type="tel" id="driverPhone" placeholder="رقم الهاتف" required>
+                    <input type="password" id="driverPassword" placeholder="كلمة المرور" required>
+                    <input type="text" id="driverVehicle" placeholder="نوع المركبة (مثال: تويوتا كامري)" required>
+                    <input type="text" id="driverPlate" placeholder="رقم اللوحة" required>
+                    <input type="text" id="driverLicense" placeholder="رقم الرخصة" required>
+                    <input type="text" id="driverNationalId" placeholder="رقم الهوية" required>
+                </div>
+                <button type="submit" class="submit-btn"><i class="fas fa-save"></i> حفظ السائق</button>
+            </form>
+        </div>
+
+        <!-- التبويبات -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('drivers')">🚗 السائقين</button>
+            <button class="tab-btn" onclick="switchTab('users')">👤 الركاب</button>
+            <button class="tab-btn" onclick="switchTab('rides')">📋 الرحلات</button>
+        </div>
+
+        <!-- جدول السائقين -->
+        <div id="driversTab" class="table-container">
+            <table>
+                <thead>
+                    <tr><th>الاسم</th><th>رقم الهاتف</th><th>المركبة</th><th>اللوحة</th><th>الحالة</th><th>الإجراءات</th></tr>
+                </thead>
+                <tbody id="driversTable"></tbody>
+            </table>
+        </div>
+
+        <!-- جدول الركاب -->
+        <div id="usersTab" class="table-container" style="display:none;">
+            <table>
+                <thead><tr><th>الاسم</th><th>رقم الهاتف</th><th>تاريخ التسجيل</th><th>عدد الرحلات</th></tr></thead>
+                <tbody id="usersTable"></tbody>
+            </table>
+        </div>
+
+        <!-- جدول الرحلات -->
+        <div id="ridesTab" class="table-container" style="display:none;">
+            <table>
+                <thead><tr><th>الراكب</th><th>السائق</th><th>السعر</th><th>الحالة</th><th>التاريخ</th></tr></thead>
+                <tbody id="ridesTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let token = null;
+
+        // تسجيل الدخول
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone: email, password, role: 'admin' })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                token = data.user.id;
+                localStorage.setItem('adminToken', token);
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                loadStats();
+                loadDrivers();
+                loadUsers();
+                loadRides();
+            } else {
+                alert('بيانات الدخول غير صحيحة');
+            }
+        });
+
+        // التحقق من الجلسة
+        if (localStorage.getItem('adminToken')) {
+            token = localStorage.getItem('adminToken');
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            loadStats();
+            loadDrivers();
+            loadUsers();
+            loadRides();
+        }
+
+        function logout() {
+            localStorage.removeItem('adminToken');
+            token = null;
+            document.getElementById('loginContainer').style.display = 'flex';
+            document.getElementById('dashboard').style.display = 'none';
+        }
+
+        async function loadStats() {
+            const response = await fetch('/api/admin/stats');
+            const stats = await response.json();
+            document.getElementById('totalUsers').innerText = stats.totalUsers;
+            document.getElementById('totalDrivers').innerText = stats.totalDrivers;
+            document.getElementById('pendingDrivers').innerText = stats.pendingDrivers;
+            document.getElementById('activeDrivers').innerText = stats.activeDrivers;
+        }
+
+        async function loadDrivers() {
+            const response = await fetch('/api/admin/drivers');
+            const drivers = await response.json();
+            const tbody = document.getElementById('driversTable');
+            tbody.innerHTML = drivers.map(driver => `
+                <tr>
+                    <td>${driver.name}</td>
+                    <td>${driver.phone}</td>
+                    <td>${driver.vehicle || '-'}</td>
+                    <td>${driver.plate || '-'}</td>
+                    <td><span class="status-badge status-${driver.status}">${driver.status === 'approved' ? 'موافق' : driver.status === 'pending' ? 'قيد المراجعة' : 'مرفوض'}</span></td>
+                    <td>
+                        ${driver.status === 'pending' ? `<button class="action-btn approve-btn" onclick="approveDriver('${driver.id}')"><i class="fas fa-check"></i></button>` : ''}
+                        ${driver.status === 'pending' ? `<button class="action-btn reject-btn" onclick="rejectDriver('${driver.id}')"><i class="fas fa-times"></i></button>` : ''}
+                        <button class="action-btn delete-btn" onclick="deleteDriver('${driver.id}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadUsers() {
+            const response = await fetch('/api/admin/users');
+            const users = await response.json();
+            document.getElementById('usersTable').innerHTML = users.map(user => `
+                <tr><td>${user.name}</td><td>${user.phone}</td><td>${new Date(user.createdAt).toLocaleDateString('ar')}</td><td>${user.ridesCount}</td></tr>
+            `).join('');
+        }
+
+        async function loadRides() {
+            const response = await fetch('/api/admin/rides');
+            const rides = await response.json();
+            document.getElementById('ridesTable').innerHTML = rides.map(ride => `
+                <tr><td>${ride.userName}</td><td>${ride.driverName}</td><td>${ride.price} ريال</td><td>${ride.status === 'accepted' ? 'مكتملة' : 'قيد التنفيذ'}</td><td>${new Date(ride.createdAt).toLocaleDateString('ar')}</td></tr>
+            `).join('');
+        }
+
+        async function approveDriver(driverId) {
+            const response = await fetch('/api/admin/approve-driver', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ driverId })
+            });
+            const result = await response.json();
+            if (result.success) {
+                alert(result.message);
+                loadDrivers();
+                loadStats();
+            }
+        }
+
+        async function rejectDriver(driverId) {
+            const response = await fetch('/api/admin/reject-driver', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ driverId })
+            });
+            const result = await response.json();
+            if (result.success) {
+                alert(result.message);
+                loadDrivers();
+                loadStats();
+            }
+        }
+
+        async function deleteDriver(driverId) {
+            if (confirm('هل أنت متأكد من حذف هذا السائق؟')) {
+                const response = await fetch(`/api/admin/delete-driver/${driverId}`, { method: 'DELETE' });
+                const result = await response.json();
+                if (result.success) {
+                    alert(result.message);
+                    loadDrivers();
+                    loadStats();
+                }
+            }
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('driversTab').style.display = tab === 'drivers' ? 'block' : 'none';
+            document.getElementById('usersTab').style.display = tab === 'users' ? 'block' : 'none';
+            document.getElementById('ridesTab').style.display = tab === 'rides' ? 'block' : 'none';
+        }
+
+        function toggleAddDriverForm() {
+            const form = document.getElementById('addDriverForm');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+
+        document.getElementById('addDriverFormElement').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const driverData = {
+                name: document.getElementById('driverName').value,
+                phone: document.getElementById('driverPhone').value,
+                password: document.getElementById('driverPassword').value,
+                vehicle: document.getElementById('driverVehicle').value,
+                plate: document.getElementById('driverPlate').value,
+                licenseNumber: document.getElementById('driverLicense').value,
+                nationalId: document.getElementById('driverNationalId').value
+            };
+            
+            const response = await fetch('/api/admin/add-driver', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(driverData)
+            });
+            const result = await response.json();
+            if (result.success) {
+                alert(result.message);
+                toggleAddDriverForm();
+                loadDrivers();
+                loadStats();
+                document.getElementById('addDriverFormElement').reset();
+            } else {
+                alert(result.message);
+            }
+        });
+    </script>
+</body>
+</html>
